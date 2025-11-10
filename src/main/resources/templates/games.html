@@ -149,10 +149,12 @@
                 <p class="desc" th:text="${game.description}">Short Description...</p>
 
                 <!-- Dynamic star rating -->
-                <div class="stars"
-                     th:utext="'★'.repeat(${game.rating}) + '☆'.repeat(5 - ${game.rating})">
-                    ★★★★☆
+                <div class="stars">
+                    <th:block th:each="i : ${#numbers.sequence(1,5)}">
+                        <span th:text="${i <= game.rating ? '★' : '☆'}"></span>
+                    </th:block>
                 </div>
+
 
                 <a class="view-btn" th:href="@{'/games/' + ${game.id}}">View Details</a>
             </div>
