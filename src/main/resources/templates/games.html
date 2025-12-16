@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Browse Games</title>
@@ -118,6 +118,10 @@
         .view-btn:hover {
             background: #fff;
         }
+
+        .admin-panel { margin-bottom: 18px; }
+        .admin-panel form input, .admin-panel form select { padding:6px; margin-right:6px; }
+        .delete-btn { background:#ff5c5c; color:black; padding:6px 8px; border-radius:4px; border:none; font-weight:bold; }
     </style>
 </head>
 
@@ -128,11 +132,36 @@
     <h1>Browse Games</h1>
     <div class="nav-links">
         <a href="/">Home</a>
+        <a href="/games">Browse Games</a>
+        <sec:authorize access="isAuthenticated()">
+            <a th:href="@{/logout}" onclick="event.preventDefault(); document.getElementById('logoutForm').submit();">Logout</a>
+            <form id="logoutForm" th:action="@{/logout}" method="post" style="display:none;">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            </form>
+        </sec:authorize>
+        <sec:authorize access="!isAuthenticated()">
+            <a href="/login">Login</a>
+        </sec:authorize>
     </div>
 </div>
 
 <!-- Main Content -->
 <div class="container">
+
+    <sec:authorize access="isAuthenticated()">
+        <div class="admin-panel">
+            <h3>Add a new game</h3>
+            <form id="createGameForm" th:action="@{/api/games}" method="post" onsubmit="return submitCreate(event)">
+                <input type="text" name="title" placeholder="Title" required />
+                <input type="text" name="genre" placeholder="Genre" />
+                <input type="text" name="developer" placeholder="Developer" />
+                <input type="text" name="image" placeholder="Image filename" />
+                <input type="number" step="0.1" name="price" placeholder="Price" />
+                <input type="number" name="rating" min="0" max="5" placeholder="Rating" />
+                <button type="submit">Create Game</button>
+            </form>
+        </div>
+    </sec:authorize>
 
     <div class="game-list">
 
@@ -157,6 +186,10 @@
 
 
                 <a class="view-btn" th:href="@{'/games/' + ${game.id}}">View Details</a>
+
+                <sec:authorize access="isAuthenticated()">
+                    <button class="delete-btn" th:onclick="|deleteGame(${game.id})|">Delete</button>
+                </sec:authorize>
             </div>
         </div>
 
@@ -169,6 +202,31 @@
     </div>
 
 </div>
+
+<script>
+    function submitCreate(e) {
+        e.preventDefault();
+        const form = document.getElementById('createGameForm');
+        const data = new FormData(form);
+        const obj = {};
+        data.forEach((v,k)=> obj[k] = v);
+        fetch('/api/games', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(obj)
+        }).then(r => {
+            if (r.ok) window.location.reload();
+            else alert('Failed to create');
+        });
+        return false;
+    }
+
+    function deleteGame(id) {
+        if (!confirm('Delete this game?')) return;
+        fetch('/api/games/' + id, { method: 'DELETE' })
+            .then(r => { if (r.ok) window.location.reload(); else alert('Failed to delete'); });
+    }
+</script>
 
 </body>
 </html>

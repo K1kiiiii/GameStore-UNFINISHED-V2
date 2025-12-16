@@ -26,4 +26,10 @@ public class GameService {
     public Game saveGame(Game game) {
         return gameRepository.save(game);
     }
+
+    public boolean deleteById(Long id) {
+        if (!gameRepository.existsById(id)) return false;
+        gameRepository.deleteById(id);
+        return true;
+    }
 }

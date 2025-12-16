@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Game Store</title>
@@ -143,6 +143,16 @@
 <!-- Navigation -->
 <div class="top-nav">
     <a href="/games" class="nav-btn">Browse Games</a>
+    <!-- show Login when anonymous, Logout when authenticated -->
+    <sec:authorize access="!isAuthenticated()">
+        <a href="/login" class="nav-btn">Login</a>
+    </sec:authorize>
+    <sec:authorize access="isAuthenticated()">
+        <form th:action="@{/logout}" method="post" style="display:inline">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <button type="submit" class="nav-btn">Logout</button>
+        </form>
+    </sec:authorize>
 </div>
 
 <!-- Banner -->
@@ -196,4 +206,3 @@
 
 </body>
 </html>
-
