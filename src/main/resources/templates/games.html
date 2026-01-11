@@ -139,7 +139,7 @@
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             </form>
         </div>
-        <div th:if="${!authenticated}">
+        <div th:unless="${authenticated}">
             <a href="/login">Login</a>
         </div>
     </div>

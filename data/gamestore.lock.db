@@ -1,6 +1,6 @@
 #FileLock
-#Sat Jan 10 16:27:42 CET 2026
-hostName=Main-PC
-id=19ba8853a5eeb034517257497ba9b03f98c97747a98
+#Sun Jan 11 20:35:17 CET 2026
+hostName=KI-CA
+id=19bae8e30ccd2da40e06aee8b2c33f389d0d55817bb
 method=file
-server=192.168.50.11\:60055
+server=192.168.100.188\:52777

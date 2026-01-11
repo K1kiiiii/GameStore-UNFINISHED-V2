@@ -33,9 +33,8 @@ public class SecurityConfig {
                 .formLogin(form -> form
                         // vlastita stranica za login (umjesto default Spring stranice)
                         .loginPage("/login")
-                        // defaultSuccessUrl sa 'false' znači: ako postoji spremljeni zahtjev
-                        // (saved request), korisnik će biti vraćen na njega; inače ide na /games
-                        .defaultSuccessUrl("/games", false)
+                        // defaultSuccessUrl sa 'true' znači: uvek redirektuj na /games nakon uspešnog login-a
+                        .defaultSuccessUrl("/games", true)
                         .permitAll()
                 )
                 .logout(logout -> logout
