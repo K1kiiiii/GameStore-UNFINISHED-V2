@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Browse Games</title>
+    <style>
+        /* Header layout */
+        .site-header { display:flex; align-items:center; justify-content:space-between; padding:12px 20px; background:#0f1720; color:#c7d5e0; }
+        .header-left, .header-center, .header-right { display:flex; align-items:center; }
+        .header-left { gap:10px; }
+        .site-logo { height:36px; width:auto; display:inline-block; }
+        .nav-btn.small { padding:8px 12px; font-size:14px; }
+        .search-form { width:420px; }
+        .search-input { width:100%; padding:8px 10px; border-radius:6px; border:1px solid #213445; background:#12202b; color:#c7d5e0; }
+    </style>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #1b2838;
+            color: #c7d5e0;
+        }
+
+        .top-nav {
+            background-color: #171a21;
+            padding: 15px 20px;
+            display:flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .top-nav h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #66c0f4;
+        }
+        .nav-links a {
+            margin-left: 15px;
+            text-decoration: none;
+            color: #c7d5e0;
+            font-weight: bold;
+        }
+        .nav-links a:hover {
+            color: #fff;
+        }
+
+        .container {
+            padding: 25px 40px;
+        }
+
+        /* Game Grid */
+        .game-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        /* Card Styling */
+        .game-card {
+            background:#16202d;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+            transition: transform .2s ease;
+            cursor: pointer;
+        }
+        .game-card:hover { transform: scale(1.03); }
+
+        .game-img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .game-info {
+            padding: 10px;
+        }
+        .game-title {
+            font-size: 18px;
+            margin: 0 0 4px;
+            font-weight:bold;
+        }
+        .price {
+            font-size: 14px;
+            font-weight:bold;
+            margin-top:4px;
+            color: #a4d007;
+        }
+
+        /* Hover Overlay */
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            opacity: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 15px;
+            gap: 10px;
+            transition: opacity .25s;
+        }
+        .game-card:hover .overlay {
+            opacity: 1;
+        }
+        .overlay .desc {
+            font-size: 14px;
+            line-height: 1.3;
+            height: 50px;
+            overflow:hidden;
+        }
+
+        /* Star Ratings */
+        .stars {
+            color: gold;
+            font-size: 16px;
+        }
+
+        /* Read more button */
+        .view-btn {
+            background: #66c0f4;
+            color: #000;
+            text-align: center;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-weight:bold;
+            text-decoration:none;
+        }
+        .view-btn:hover {
+            background: #fff;
+        }
+
+        .admin-panel { margin-bottom: 18px; }
+        .admin-panel form input, .admin-panel form select { padding:6px; margin-right:6px; }
+        .delete-btn { background:#ff5c5c; color:black; padding:6px 8px; border-radius:4px; border:none; font-weight:bold; }
+    </style>
+</head>
+
+<body>
+
+<!-- Header with logo -->
+<header class="site-header">
+    <div class="header-left">
+        <a href="/games" class="nav-btn small">Browse Games</a>
+        <a href="/"><img src="/images/image_2026-01-14_104444945-removebg-preview.png" alt="Logo" class="site-logo"/></a>
+    </div>
+
+    <div class="header-center"></div>
+
+    <div class="header-right">
+        <div th:if="${!authenticated}">
+            <a href="/login" class="nav-btn">Login</a>
+        </div>
+        <div th:if="${authenticated}">
+            <form th:action="@{/logout}" method="post" style="display:inline">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <button type="submit" class="nav-btn">Logout</button>
+            </form>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<div class="container">
+
+    <div th:if="${authenticated}">
+        <div class="admin-panel">
+            <h3>Add a new game</h3>
+            <form id="createGameForm" th:action="@{/api/games/upload}" method="post" enctype="multipart/form-data" onsubmit="return submitCreate(event)">
+                <input type="text" name="title" placeholder="Title" required />
+                <input type="text" name="genre" placeholder="Genre (comma or space separated)" />
+                <input type="text" name="developer" placeholder="Developer" />
+                <textarea name="description" placeholder="Short description" rows="3" style="vertical-align:top; padding:6px; margin-right:6px;"></textarea>
+                <input type="file" name="imageFile" accept="image/*" />
+                <input type="number" step="0.1" name="price" placeholder="Price" />
+                <input type="number" name="rating" min="0" max="5" placeholder="Rating" />
+                <button type="submit">Create Game</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="game-list">
+
+        <!-- Game List Loop -->
+        <div class="game-card" th:each="game : ${games}">
+            <img th:src="@{'/images/' + ${game.image}}" class="game-img" alt="game">
+
+
+            <div class="game-info">
+                <p class="game-title" th:text="${game.title}">Game Title</p>
+                <p class="price" th:text="${game.price} + '€'">9.99€</p>
+            </div>
+
+            <div class="overlay">
+                <p class="desc" th:text="${game.description}">Short Description...</p>
+
+                <!-- Dynamic star rating -->
+                <div class="stars">
+                    <th:block th:each="i : ${#numbers.sequence(1,5)}">
+                        <span th:text="${i <= game.rating ? '★' : '☆'}"></span>
+                    </th:block>
+                </div>
+
+
+                <a class="view-btn" th:href="@{'/games/' + ${game.id}}">View Details</a>
+
+                <div th:if="${authenticated}">
+                    <button class="delete-btn" th:onclick="|deleteGame(${game.id})|">Delete</button>
+                </div>
+             </div>
+         </div>
+
+        <!-- Show message if list is empty -->
+        <p th:if="${games == null or #lists.isEmpty(games)}"
+           style="grid-column: 1 / -1; text-align:center;font-size:18px;">
+            No games found. Come back later!
+        </p>
+
+    </div>
+
+</div>
+
+<script>
+    async function submitCreate(e) {
+        e.preventDefault();
+        const form = document.getElementById('createGameForm');
+        const fd = new FormData(form);
+
+        // convert genre string into individual genres and append as multiple fields 'genres'
+        const rawGenre = fd.get('genre');
+        fd.delete('genre');
+        if (rawGenre) {
+            const parts = rawGenre.trim().split(/[,\s-]+/).map(s=>s.trim()).filter(s=>s.length>0);
+            parts.forEach(p => fd.append('genres', p));
+        }
+
+        try {
+            const res = await fetch('/api/games/upload', {
+                method: 'POST',
+                body: fd
+            });
+            if (res.ok) window.location.reload();
+            else {
+                const t = await res.text();
+                alert('Failed to create: ' + t);
+            }
+        } catch (err) {
+            alert('Failed to create: ' + err.message);
+        }
+        return false;
+    }
+
+    function deleteGame(id) {
+        if (!confirm('Delete this game?')) return;
+        fetch('/api/games/' + id, { method: 'DELETE' })
+            .then(r => { if (r.ok) window.location.reload(); else alert('Failed to delete'); });
+    }
+</script>
+
+</body>
+</html>
