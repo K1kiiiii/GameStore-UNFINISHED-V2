@@ -2,6 +2,9 @@ package com.example.demo.model;
 
 import jakarta.persistence.*;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 @Entity
 public class Game {
@@ -10,7 +13,17 @@ public class Game {
     private Long id;
 
     private String title;
-    private String genre;
+
+    // Legacy single-column storage kept for backward compatibility (reads existing DB rows)
+    @Column(name = "genre")
+    private String legacyGenre;
+
+    // Changed: store multiple genres per game
+    @ElementCollection
+    @CollectionTable(name = "game_genres", joinColumns = @JoinColumn(name = "game_id"))
+    @Column(name = "genre")
+    private List<String> genres = new ArrayList<>();
+
     private String developer;
     private String description;
     private String image;
@@ -32,6 +45,21 @@ public class Game {
     public Game() {
     }
 
+    // Lifecycle callbacks to migrate legacy single-column values into the collection and to keep them in sync
+    @PostLoad
+    private void populateGenresFromLegacy() {
+        if ((this.genres == null || this.genres.isEmpty()) && this.legacyGenre != null && !this.legacyGenre.trim().isEmpty()) {
+            setGenre(this.legacyGenre);
+        }
+    }
+
+    @PrePersist
+    @PreUpdate
+    private void syncLegacyGenre() {
+        // Keep the legacy column populated for compatibility with tools that expect it
+        this.legacyGenre = getGenre();
+    }
+
     // Getters and setters
     public Long getId() {
         return id;
@@ -49,12 +77,32 @@ public class Game {
         this.title = title;
     }
 
-    public String getGenre() {
-        return genre;
+    // New getters/setters for the list of genres
+    public List<String> getGenres() {
+        return genres;
     }
 
+    public void setGenres(List<String> genres) {
+        this.genres = genres;
+    }
+
+    // Backwards-compatible single-string accessor for existing code/templates.
+    // Returns a single string with genres joined by a space.
+    public String getGenre() {
+        return String.join(" ", this.genres == null ? new ArrayList<>() : this.genres);
+    }
+
+    // Accept a single string (e.g. "Action RPG" or "Action, RPG") and split into individual genres.
     public void setGenre(String genre) {
-        this.genre = genre;
+        if (genre == null) {
+            this.genres = new ArrayList<>();
+            return;
+        }
+        // Split on commas, whitespace, or hyphens, trim each entry and filter out empties
+        this.genres = Arrays.stream(genre.split("[,\\s-]+"))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList());
     }
 
     public String getDeveloper() {
@@ -114,4 +162,10 @@ public class Game {
     public void setPublisher(Publisher publisher) {
         this.publisher = publisher;
     }
+
+    // Expose legacyGenre for compatibility checks
+    public String getLegacyGenre() {
+        return legacyGenre;
+    }
+
 }

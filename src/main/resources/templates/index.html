@@ -4,6 +4,22 @@
     <meta charset="UTF-8">
     <title>Game Store</title>
     <style>
+        /* Header layout */
+        .site-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            background: #0f1720;
+            color: #c7d5e0;
+        }
+        .header-left, .header-center, .header-right { display: flex; align-items: center; }
+        .header-left { gap: 10px; }
+        .site-logo { height: 36px; width: auto; display: inline-block; }
+        .nav-btn.small { padding: 8px 12px; font-size: 14px; }
+        .search-form { width: 420px; }
+        .search-input { width: 100%; padding: 8px 10px; border-radius: 6px; border: 1px solid #213445; background:#12202b; color:#c7d5e0; }
+
         body {
             margin: 0;
             font-family: Arial, sans-serif;
@@ -135,25 +151,55 @@
             background: #66c0f4;
             color:black;
         }
+
+        /* GENRE SECTIONS */
+        .genre-section {
+            padding: 20px;
+        }
+        .genre-title {
+            font-size: 22px;
+            margin-bottom: 12px;
+            color: #ffffff;
+        }
+        .genre-row {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
     </style>
 </head>
 
 <body>
 
-<!-- Navigation -->
-<div class="top-nav">
-    <a href="/games" class="nav-btn">Browse Games</a>
-    <!-- show Login when anonymous, Logout when authenticated -->
-    <div th:if="${!authenticated}">
-        <a href="/login" class="nav-btn">Login</a>
+<!-- Header with logo and search -->
+<header class="site-header">
+    <div class="header-left">
+        <a href="/games" class="nav-btn small">Browse Games</a>
+        <a href="/"><img src="/images/image_2026-01-14_104444945-removebg-preview.png" alt="Logo" class="site-logo"/></a>
     </div>
-    <div th:if="${authenticated}">
-        <form th:action="@{/logout}" method="post" style="display:inline">
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-            <button type="submit" class="nav-btn">Logout</button>
+
+    <div class="header-center">
+        <form class="search-form" action="/games" method="get" onsubmit="return false;">
+            <input id="headerSearch" class="search-input" type="search" name="q" placeholder="Search games..." autocomplete="off" />
+            <div id="searchDropdown" style="position:relative;">
+                <ul id="searchResults" style="position:absolute; left:0; right:0; background:#0f1720; border:1px solid #213445; max-height:300px; overflow:auto; margin:6px 0 0 0; padding:6px; list-style:none; display:none; border-radius:6px; z-index:2000;"></ul>
+            </div>
         </form>
     </div>
-</div>
+
+    <div class="header-right">
+        <div th:if="${!authenticated}">
+            <a href="/login" class="nav-btn">Login</a>
+        </div>
+        <div th:if="${authenticated}">
+            <form th:action="@{/logout}" method="post" style="display:inline">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <button type="submit" class="nav-btn">Logout</button>
+            </form>
+        </div>
+    </div>
+</header>
 
 <!-- Banner -->
 <div class="hero">
@@ -203,6 +249,205 @@
 
     </div>
 </div>
+
+
+<!-- Genre Sections -->
+<div class="genre-section">
+    <!-- Action -->
+    <div th:if="${actionGames != null and !#lists.isEmpty(actionGames)}">
+        <h2 class="genre-title">Action</h2>
+        <div class="genre-row">
+            <div class="game-card" th:each="game : ${actionGames}">
+                <img th:src="@{'/images/' + ${game.image}}" alt="">
+                <div class="game-details">
+                    <p class="game-title" th:text="${game.title}">Game Title</p>
+                </div>
+                <div class="overlay">
+                    <div class="desc" th:text="${game.description}">Description preview</div>
+                    <div class="stars">
+                        <th:block th:each="i : ${#numbers.sequence(1, 5)}">
+                            <span th:text="${i <= game.rating ? '★' : '☆'}"></span>
+                        </th:block>
+                    </div>
+                    <a class="view-btn" th:href="@{'/games/' + ${game.id}}">View Details</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RPG -->
+    <div th:if="${rpgGames != null and !#lists.isEmpty(rpgGames)}">
+        <h2 class="genre-title">RPG</h2>
+        <div class="genre-row">
+            <div class="game-card" th:each="game : ${rpgGames}">
+                <img th:src="@{'/images/' + ${game.image}}" alt="">
+                <div class="game-details">
+                    <p class="game-title" th:text="${game.title}">Game Title</p>
+                </div>
+                <div class="overlay">
+                    <div class="desc" th:text="${game.description}">Description preview</div>
+                    <div class="stars">
+                        <th:block th:each="i : ${#numbers.sequence(1, 5)}">
+                            <span th:text="${i <= game.rating ? '★' : '☆'}"></span>
+                        </th:block>
+                    </div>
+                    <a class="view-btn" th:href="@{'/games/' + ${game.id}}">View Details</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Adventure -->
+    <div th:if="${advGames != null and !#lists.isEmpty(advGames)}">
+        <h2 class="genre-title">Adventure</h2>
+        <div class="genre-row">
+            <div class="game-card" th:each="game : ${advGames}">
+                <img th:src="@{'/images/' + ${game.image}}" alt="">
+                <div class="game-details">
+                    <p class="game-title" th:text="${game.title}">Game Title</p>
+                </div>
+                <div class="overlay">
+                    <div class="desc" th:text="${game.description}">Description preview</div>
+                    <div class="stars">
+                        <th:block th:each="i : ${#numbers.sequence(1, 5)}">
+                            <span th:text="${i <= game.rating ? '★' : '☆'}"></span>
+                        </th:block>
+                    </div>
+                    <a class="view-btn" th:href="@{'/games/' + ${game.id}}">View Details</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sandbox -->
+    <div th:if="${sandboxGames != null and !#lists.isEmpty(sandboxGames)}">
+        <h2 class="genre-title">Sandbox</h2>
+        <div class="genre-row">
+            <div class="game-card" th:each="game : ${sandboxGames}">
+                <img th:src="@{'/images/' + ${game.image}}" alt="">
+                <div class="game-details">
+                    <p class="game-title" th:text="${game.title}">Game Title</p>
+                </div>
+                <div class="overlay">
+                    <div class="desc" th:text="${game.description}">Description preview</div>
+                    <div class="stars">
+                        <th:block th:each="i : ${#numbers.sequence(1, 5)}">
+                            <span th:text="${i <= game.rating ? '★' : '☆'}"></span>
+                        </th:block>
+                    </div>
+                    <a class="view-btn" th:href="@{'/games/' + ${game.id}}">View Details</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+// Live search dropdown (debounced 500ms)
+(function(){
+    const input = document.getElementById('headerSearch');
+    const resultsEl = document.getElementById('searchResults');
+    if (!input || !resultsEl) return; // safety
+    let timeout = null;
+    let selected = -1;
+
+    async function searchServer(query) {
+        const url = '/api/games/search?q=' + encodeURIComponent(query);
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('search failed: ' + res.status);
+        return res.json();
+    }
+
+    function clearResults() {
+        resultsEl.innerHTML = '';
+        resultsEl.style.display = 'none';
+        selected = -1;
+    }
+
+    function renderResults(list) {
+        resultsEl.innerHTML = '';
+        if (!list || list.length === 0) { clearResults(); return; }
+        list.forEach((g, idx) => {
+            const li = document.createElement('li');
+            li.style.display = 'flex';
+            li.style.alignItems = 'center';
+            li.style.gap = '10px';
+            li.style.padding = '6px';
+            li.style.cursor = 'pointer';
+            li.style.borderRadius = '4px';
+            li.onmouseenter = () => { setSelected(idx); };
+            li.onclick = () => { window.location.href = '/games/' + g.id; };
+
+            const img = document.createElement('img');
+            img.src = '/images/' + (g.image || 'default-game.jpg');
+            img.style.width = '48px'; img.style.height = '48px'; img.style.objectFit = 'cover'; img.style.borderRadius='4px';
+
+            const title = document.createElement('div');
+            title.style.flex = '1';
+            title.style.color = '#c7d5e0';
+            title.textContent = g.title || '';
+
+            const price = document.createElement('div');
+            price.style.color = '#a4d007';
+            price.textContent = (g.price != null ? g.price + '€' : '—');
+
+            li.appendChild(img);
+            li.appendChild(title);
+            li.appendChild(price);
+            resultsEl.appendChild(li);
+        });
+        resultsEl.style.display = 'block';
+    }
+
+    function setSelected(idx) {
+        const children = Array.from(resultsEl.children);
+        children.forEach((c,i)=> c.style.background = (i===idx ? '#1b3344' : 'transparent'));
+        selected = idx;
+    }
+
+    input.addEventListener('input', () => {
+        clearTimeout(timeout);
+        timeout = setTimeout(async () => {
+            const q = input.value.trim();
+            if (!q) { clearResults(); return; }
+            try {
+                const matches = await searchServer(q);
+                renderResults(matches);
+            } catch (err) {
+                console.error('Search failed', err);
+                clearResults();
+            }
+        }, 500);
+    });
+
+    // keyboard navigation
+    input.addEventListener('keydown', (e) => {
+        const count = resultsEl.children.length;
+        if (count === 0) return;
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            const next = (selected + 1) % count;
+            setSelected(next);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            const prev = (selected - 1 + count) % count;
+            setSelected(prev);
+        } else if (e.key === 'Enter') {
+            if (selected >= 0 && selected < count) {
+                resultsEl.children[selected].click();
+            }
+        } else if (e.key === 'Escape') {
+            clearResults();
+        }
+    });
+
+    // hide when clicking outside
+    document.addEventListener('click', (ev)=>{
+        if (!input.contains(ev.target) && !resultsEl.contains(ev.target)) clearResults();
+    });
+})();
+</script>
 
 </body>
 </html>

@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <title th:text="${game.title} + ' - Game Store'">Game Details</title>
     <style>
+        /* Header layout (shared) */
+        .site-header { display:flex; align-items:center; justify-content:space-between; padding:12px 20px; background:#0f1720; color:#c7d5e0; }
+        .header-left, .header-center, .header-right { display:flex; align-items:center; }
+        .header-left { gap:10px; }
+        .site-logo { height:36px; width:auto; display:inline-block; }
+        .nav-btn.small { padding:8px 12px; font-size:14px; }
+        .search-form { width:420px; }
+        .search-input { width:100%; padding:8px 10px; border-radius:6px; border:1px solid #213445; background:#12202b; color:#c7d5e0; }
+
         body {
             margin: 0;
             font-family: Arial, sans-serif;
@@ -150,15 +159,18 @@
 </head>
 <body>
 
-<!-- Navigation -->
-<div class="top-nav">
-    <h1 th:text="${game.title}">Game Details</h1>
-    <div class="nav-links">
-        <a href="/">Home</a>
-        <a href="/games">Browse Games</a>
-        <!-- show Login when anonymous, Logout when authenticated -->
-        <div th:unless="${authenticated}">
-            <a href="/login">Login</a>
+<!-- Header with logo -->
+<header class="site-header">
+    <div class="header-left">
+        <a href="/games" class="nav-btn small">Browse Games</a>
+        <a href="/"><img src="/images/image_2026-01-14_104444945-removebg-preview.png" alt="Logo" class="site-logo"/></a>
+    </div>
+
+    <div class="header-center"></div>
+
+    <div class="header-right">
+        <div th:if="${!authenticated}">
+            <a href="/login" class="nav-btn">Login</a>
         </div>
         <div th:if="${authenticated}">
             <form th:action="@{/logout}" method="post" style="display:inline">
@@ -167,7 +179,7 @@
             </form>
         </div>
     </div>
-</div>
+</header>
 
 <!-- Main Game Details -->
 <div class="container">
@@ -241,30 +253,6 @@
             <span th:text="${rev.rating} + '/5'">5/5</span>
         </div>
         <div class="content" th:text="${rev.content}">Review content</div>
-
-        <!-- small inline edit form -->
-        <form th:action="@{'/games/' + ${game.id} + '/reviews/update/' + ${rev.id}}" method="post" style="margin-top:8px; display:flex; gap:8px;">
-            <input type="text" name="author" th:value="${rev.author}" placeholder="Your name" />
-            <select name="rating">
-                <option th:each="i : ${#numbers.sequence(1,5)}" th:value="${i}" th:text="${i}" th:selected="${i == rev.rating}"></option>
-            </select>
-            <input type="text" name="content" th:value="${rev.content}" style="width:400px;" />
-            <button type="submit">Update</button>
-        </form>
-
-    </div>
-
-    <!-- Add new review form -->
-    <div style="margin-top:18px;">
-        <h4>Add a review</h4>
-        <form th:action="@{'/games/' + ${game.id} + '/reviews'}" method="post" class="review-form">
-            <input type="text" name="author" placeholder="Your name" required />
-            <select name="rating">
-                <option th:each="i : ${#numbers.sequence(1,5)}" th:value="${i}" th:text="${i}"></option>
-            </select>
-            <textarea name="content" placeholder="Write your review..." required></textarea>
-            <button type="submit">Submit</button>
-        </form>
     </div>
 
 </div>

@@ -5,12 +5,15 @@
     <title>Publisher Form</title>
 </head>
 <body>
+<header class="site-header" style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:#0f1720;color:#c7d5e0;">
+    <div class="header-left"><a href="/games" class="nav-btn small" style="padding:8px 12px;color:#c7d5e0;text-decoration:none;background:#4c6b8a;border-radius:4px;">Browse Games</a> <a href="/"><img src="/images/image_2026-01-14_104444945-removebg-preview.png" alt="Logo" style="height:36px;"/></a></div>
+    <div class="header-right"><div th:if="${!authenticated}"><a href="/login" style="color:#c7d5e0;text-decoration:none;">Login</a></div><div th:if="${authenticated}"><form th:action="@{/logout}" method="post" style="display:inline"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/><button type="submit" class="nav-btn">Logout</button></form></div></div>
+</header>
 <h1 th:text="${publisher.id} != null ? 'Edit Publisher' : 'New Publisher'"></h1>
-<form th:action="${publisher.id} != null ? @{'/publishers/update/' + ${publisher.id}} : @{'/publishers'}" th:object="${publisher}" method="post">
+<form th:action="${publisher.id} != null ? @{/publishers/update/{id}(id=${publisher.id})} : @{/publishers}" th:object="${publisher}" method="post">
     <label>Name: <input type="text" th:field="*{name}"/></label><br/>
     <label>Country: <input type="text" th:field="*{country}"/></label><br/>
     <button type="submit">Save</button>
 </form>
 </body>
 </html>
-

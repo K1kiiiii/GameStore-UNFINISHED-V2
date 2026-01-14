@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -25,6 +26,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         // dozvoli pristup statičkim resursima i javnim stranicama bez prijave
                         .requestMatchers("/css/**", "/images/**", "/", "/games", "/games/**", "/login").permitAll()
+                        // allow public GET access to games REST endpoint so the header search can fetch it
+                        .requestMatchers(HttpMethod.GET, "/api/games", "/api/games/**").permitAll()
                         // zahtijevaj autentifikaciju za sve /api/** pozive (npr. REST operacije)
                         .requestMatchers("/api/**").authenticated()
                         // sve ostalo zahtijeva autentifikaciju

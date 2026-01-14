@@ -4,7 +4,6 @@ import com.example.demo.model.Game;
 import com.example.demo.model.Review;
 import com.example.demo.service.GameService;
 import com.example.demo.service.ReviewService;
-import com.example.demo.service.PublisherService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,23 +12,47 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class GameController {
 
     private final GameService gameService;
     private final ReviewService reviewService;
-    private final PublisherService publisherService;
 
-    public GameController(GameService gameService, ReviewService reviewService, PublisherService publisherService) {
+    public GameController(GameService gameService, ReviewService reviewService) {
         this.gameService = gameService;
         this.reviewService = reviewService;
-        this.publisherService = publisherService;
     }
 
     @GetMapping("/")
     public String index(Model model) {
-        model.addAttribute("games", gameService.getAllGames());
+        List<Game> all = gameService.getAllGames();
+        model.addAttribute("games", all);
+        // compute per-genre lists server-side to avoid template-side filtering issues
+        model.addAttribute("actionGames", all.stream().filter(g -> {
+            if (g.getGenres() != null && g.getGenres().stream().anyMatch(s -> s.equalsIgnoreCase("Action"))) return true;
+            String lg = g.getLegacyGenre();
+            return lg != null && java.util.Arrays.stream(lg.split("[,\\s-]+")).map(String::trim).anyMatch(s -> s.equalsIgnoreCase("Action"));
+        }).collect(Collectors.toList()));
+
+        model.addAttribute("rpgGames", all.stream().filter(g -> {
+            if (g.getGenres() != null && g.getGenres().stream().anyMatch(s -> s.equalsIgnoreCase("RPG"))) return true;
+            String lg = g.getLegacyGenre();
+            return lg != null && java.util.Arrays.stream(lg.split("[,\\s-]+")).map(String::trim).anyMatch(s -> s.equalsIgnoreCase("RPG"));
+        }).collect(Collectors.toList()));
+
+        model.addAttribute("advGames", all.stream().filter(g -> {
+            if (g.getGenres() != null && g.getGenres().stream().anyMatch(s -> s.equalsIgnoreCase("Adventure"))) return true;
+            String lg = g.getLegacyGenre();
+            return lg != null && java.util.Arrays.stream(lg.split("[,\\s-]+")).map(String::trim).anyMatch(s -> s.equalsIgnoreCase("Adventure"));
+        }).collect(Collectors.toList()));
+
+        model.addAttribute("sandboxGames", all.stream().filter(g -> {
+            if (g.getGenres() != null && g.getGenres().stream().anyMatch(s -> s.equalsIgnoreCase("Sandbox"))) return true;
+            String lg = g.getLegacyGenre();
+            return lg != null && java.util.Arrays.stream(lg.split("[,\\s-]+")).map(String::trim).anyMatch(s -> s.equalsIgnoreCase("Sandbox"));
+        }).collect(Collectors.toList()));
         return "index";
     }
 

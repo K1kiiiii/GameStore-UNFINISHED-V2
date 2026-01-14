@@ -21,7 +21,7 @@ public class DataSeeder {
 
                 Game g1 = new Game();
                 g1.setTitle("The Witcher 3: Wild Hunt");
-                g1.setGenre("RPG");
+                g1.setGenre("Action, RPG");
                 g1.setDeveloper("CD Projekt Red");
                 g1.setPrice(29.99);
                 g1.setDescription("Play as Geralt of Rivia in an open world full of choices and monsters.");
@@ -31,7 +31,7 @@ public class DataSeeder {
 
                 Game g2 = new Game();
                 g2.setTitle("Red Dead Redemption 2");
-                g2.setGenre("Action-Adventure");
+                g2.setGenre("Action, Adventure");
                 g2.setDeveloper("Rockstar Games");
                 g2.setPrice(59.99);
                 g2.setDescription("Epic Western adventure in a vast open world full of life and detail.");
@@ -41,7 +41,7 @@ public class DataSeeder {
 
                 Game g3 = new Game();
                 g3.setTitle("Elden Ring");
-                g3.setGenre("Action RPG");
+                g3.setGenre("Action, RPG");
                 g3.setDeveloper("FromSoftware");
                 g3.setPrice(49.99);
                 g3.setDescription("A dark fantasy epic crafted by FromSoftware and George R. R. Martin.");
@@ -61,7 +61,7 @@ public class DataSeeder {
 
                 Game g5 = new Game();
                 g5.setTitle("Cyberpunk 2077");
-                g5.setGenre("Open World RPG");
+                g5.setGenre("Open World, RPG");
                 g5.setDeveloper("CD Projekt Red");
                 g5.setPrice(39.99);
                 g5.setDescription("Experience life in the megalopolis of Night City as a mercenary outlaw.");
@@ -91,7 +91,7 @@ public class DataSeeder {
 
                 Game g8 = new Game();
                 g8.setTitle("God of War");
-                g8.setGenre("Action-Adventure");
+                g8.setGenre("Action, Adventure");
                 g8.setDeveloper("Santa Monica Studio");
                 g8.setPrice(49.99);
                 g8.setDescription("Join Kratos and Atreus on an emotional journey through Norse mythology.");
@@ -111,7 +111,7 @@ public class DataSeeder {
 
                 Game g10 = new Game();
                 g10.setTitle("Terraria");
-                g10.setGenre("Sandbox / Adventure");
+                g10.setGenre("Sandbox, Adventure");
                 g10.setDeveloper("Re-Logic");
                 g10.setPrice(9.99);
                 g10.setDescription("Dig, fight, explore, and build in this 2D adventure game.");
